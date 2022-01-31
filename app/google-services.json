@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "714247290164",
+    "project_id": "expensr-59aa1",
+    "storage_bucket": "expensr-59aa1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714247290164:android:1b6ba7411dfab96d103961",
+        "android_client_info": {
+          "package_name": "com.programmingtubeofficial.expensr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714247290164-1df3pl8okfbqp0qsmdttlpq0d2tg1ncv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3XmufGNqw5Vw814HQ4lgdhz3WodSZkhs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714247290164-1df3pl8okfbqp0qsmdttlpq0d2tg1ncv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
