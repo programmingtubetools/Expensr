@@ -6,7 +6,10 @@ public class TransactionModel {
     private double amount;
     private TransactionType type;
     private String date;
+    private String user;
+    private int id;
 
+    public TransactionModel(){}
     public TransactionModel(String title, String date, double amount, TransactionType type) {
         this.title = title;
         this.amount = amount;
@@ -39,6 +42,22 @@ public class TransactionModel {
              this.icon = R.drawable.self_transfer_icon;
         }
         return icon;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public double getAmount() {

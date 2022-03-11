@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/HP/AndroidStudioProjects/Expensr/app/src/main/res/layout/activity_dashboard.xml" value="0.22916666666666666" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/Expensr/app/src/main/res/layout/activity_login.xml" value="0.22916666666666666" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/Expensr/app/src/main/res/layout/activity_main.xml" value="0.22916666666666666" />
         <entry key="app/src/main/res/drawable/border_background.xml" value="0.2484375" />
         <entry key="app/src/main/res/drawable/circle.xml" value="0.237" />
         <entry key="app/src/main/res/drawable/color_border_background.xml" value="0.237" />

@@ -1,6 +1,7 @@
 package com.programmingtubeofficial.expensr;
 
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +29,12 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,13 +42,17 @@ import java.util.Currency;
 
 public class dashboard extends AppCompatActivity {
     RecyclerView txnList;
-    ArrayList<TransactionModel> transactionModels;
+    ArrayList<TransactionModel> transactionModels = new ArrayList<>();
+    TransactionAdapter txnAdapter;
     private DatePicker datePicker;
     private Calendar calendar;
     private TextView dateView;
     private int year, month, day;
     private CurrencyType currency = CurrencyType.RUPEE;
     FirebaseAuth mAuth;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+    ProgressDialog progressDialog;
     private final TransactionType[] txnTypes = {TransactionType.CREDIT, TransactionType.DEBIT, TransactionType.TRANSFER};
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -54,11 +66,29 @@ public class dashboard extends AppCompatActivity {
         if(user == null){
             System.exit(1);
         }
+        progressDialog = new ProgressDialog(this);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("Transactions");
         TextView txtUsername = findViewById(R.id.txtUsername);
         txtUsername.setText(user.getDisplayName().toString().split(" ")[0]);
-        transactionModels = getTransactionModels();
-        TransactionAdapter txnAdapter = new TransactionAdapter(this, transactionModels, currency);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        transactionModels = new ArrayList<>();
+        txnList = findViewById(R.id.txnList);
+        txnList.setLayoutManager(layoutManager);
+        progressDialog.setMessage("Getting recent transactions. Please wait...");
+        progressDialog.setTitle("Fetching transactions");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+        txnAdapter = new TransactionAdapter(dashboard.this, transactionModels, currency);
+        txnAdapter.setRecent(true);
+        txnAdapter.setDatabaseReference(databaseReference);
         txnAdapter.registerAdapterDataObserver(new AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                ((TextView)findViewById(R.id.lblTxn)).setText("Recent Transactions (" + String.valueOf(transactionModels.size()) + ")");
+                updateSummary(txnAdapter.getTransactionSummary());
+            }
 
             @Override
             public void onItemRangeChanged(int positionStart, int itemCount) {
@@ -66,13 +96,47 @@ public class dashboard extends AppCompatActivity {
                 ((TextView)findViewById(R.id.lblTxn)).setText("Recent Transactions (" + String.valueOf(transactionModels.size()) + ")");
                 updateSummary(txnAdapter.getTransactionSummary());
             }
+
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                ((TextView)findViewById(R.id.lblTxn)).setText("Recent Transactions (" + String.valueOf(transactionModels.size()) + ")");
+                updateSummary(txnAdapter.getTransactionSummary());
+            }
         });
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try{
+                    for(DataSnapshot txn: snapshot.getChildren()){
+                        TransactionModel txnModel = txn.getValue(TransactionModel.class);
+                        if(txnModel.getUser().equals(mAuth.getCurrentUser().getEmail())) {
+                            if(txnModel.getType().equals(TransactionType.CREDIT)){
+                                txnAdapter.addTransactionIncome(txnModel.getAmount());
+                            }else if(txnModel.getType().equals(TransactionType.DEBIT)){
+                                txnAdapter.addTransactionExpense(txnModel.getAmount());
+                            }
+                            transactionModels.add(txnModel);
+                            txnAdapter.notifyItemInserted(transactionModels.size() - 1);
+                            txnAdapter.notifyItemRangeChanged(transactionModels.size() - 1, transactionModels.size());
+                        }
+                    }
+                    progressDialog.hide();
+                    databaseReference.removeEventListener(this);
+                }catch (Exception e){
+                    Toast.makeText(dashboard.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-        txnList = findViewById(R.id.txnList);
-        txnList.setLayoutManager(layoutManager);
+            }
+        };
+        databaseReference.addListenerForSingleValueEvent(valueEventListener);
+
         txnList.setAdapter(txnAdapter);
+
 
         ImageView btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +162,11 @@ public class dashboard extends AppCompatActivity {
                 txnAdapter.setCurrency(this.currency);
                 TransactionType txnType = txnTypes[((Spinner)findViewById(R.id.txtTxnType)).getSelectedItemPosition()];
                 TransactionModel txnDetail = new TransactionModel(txnTitle, txnDate, txnAmt, txnType);
+                txnDetail.setUser(mAuth.getCurrentUser().getEmail());
+                txnDetail.setId(transactionModels.size());
+                TransactionAdapter.updateTransaction(dashboard.this, databaseReference, txnDetail, false);
                 transactionModels.add(txnDetail);
+
                 if(txnType.equals(TransactionType.CREDIT)){
                     txnAdapter.addTransactionIncome(txnAmt);
                 }else if(txnType.equals(TransactionType.DEBIT)){
@@ -216,8 +284,9 @@ public class dashboard extends AppCompatActivity {
         return currencyImageRes;
     }
 
-    private ArrayList<TransactionModel> getTransactionModels(){
-        return new ArrayList<>(); // test
+    private void getTransactionModels(){
+        // get previous transaction details;
+
     }
 
     private boolean verifyInputs(String title, String date, String amount){

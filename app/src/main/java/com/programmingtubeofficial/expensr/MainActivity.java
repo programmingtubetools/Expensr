@@ -12,27 +12,25 @@ import com.google.firebase.auth.FirebaseUser;
  public class MainActivity extends AppCompatActivity {
 
      private FirebaseAuth mAuth;
+     private Class nextPage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // Check if any user is logged in
         mAuth = FirebaseAuth.getInstance();
-
+        nextPage = login.class;
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            openDashboard();
+            nextPage = dashboard.class;
         }
         //updateUI(currentUser);
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent=new Intent(MainActivity.this, login.class);
-                startActivity(intent);
-                finish();
-            }
-        },3000);
+        handler.postDelayed(() -> {
+            Intent intent=new Intent(MainActivity.this, nextPage);
+            startActivity(intent);
+            finish();
+        },1500);
     }
 
      private void openDashboard() {

@@ -1,27 +1,46 @@
 package com.programmingtubeofficial.expensr;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder>{
 
     private Context context;
     private ArrayList<TransactionModel> transactionModels;
     private CurrencyType currency;
-
+    private DatabaseReference databaseReference;
     private TransactionSummary transactionSummary;
+    private boolean recent = true;
+
+    public boolean isRecent() {
+        return recent;
+    }
+
+    public void setRecent(boolean recent) {
+        this.recent = recent;
+    }
 
     public void setTransactionSummary(TransactionSummary transactionSummary) {
         this.transactionSummary = transactionSummary;
@@ -41,6 +60,14 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     public void removeTransactionIncome(double amount){
         this.transactionSummary.removeIncome(amount);
+    }
+
+    public DatabaseReference getDatabaseReference() {
+        return databaseReference;
+    }
+
+    public void setDatabaseReference(DatabaseReference databaseReference) {
+        this.databaseReference = databaseReference;
     }
 
     public TransactionSummary getTransactionSummary() {
@@ -82,6 +109,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        if(position >= 10){
+            return;
+        }
         TransactionModel model = transactionModels.get(position);
 
         holder.txnTitle.setText(model.getTitle());
@@ -94,6 +124,39 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             holder.txnAmt.setTextColor(ContextCompat.getColor(context, R.color.moneyGreen));
         }else{
             holder.txnAmt.setTextColor(ContextCompat.getColor(context, R.color.cobaltBlue));
+        }
+        // save to database
+        //updateTransaction(context, databaseReference, model, false);
+    }
+    public static void updateTransaction(Context ctx, DatabaseReference dbRef, TransactionModel txnDetail, boolean delete) {
+        if(delete){
+            ValueEventListener deleteListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot deleteSnapshot: snapshot.getChildren()) {
+                        TransactionModel deleteModel = deleteSnapshot.getValue(TransactionModel.class);
+                        if(deleteModel.getId() == txnDetail.getId() && deleteModel.getUser().equals(txnDetail.getUser())){
+                            deleteSnapshot.getRef().removeValue();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            };
+            try {
+                dbRef.addListenerForSingleValueEvent(deleteListener);
+            }catch (Exception e){
+                Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
+        try{
+            dbRef.push().setValue(txnDetail);
+        }catch (Exception e){
+            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -126,6 +189,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 public void onClick(View view) {
                     int pos = getAdapterPosition();
                     TransactionModel prevModel = transactionModels.get(pos);
+                    // delete transaction
+                    updateTransaction(context, databaseReference, prevModel, true);
                     if(prevModel.getType().equals(TransactionType.CREDIT)){
                         transactionSummary.removeIncome(prevModel.getAmount());
                     }else if(prevModel.getType().equals(TransactionType.DEBIT)){
