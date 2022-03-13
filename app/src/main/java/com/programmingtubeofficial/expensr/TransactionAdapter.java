@@ -109,9 +109,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if(position >= 10){
-            return;
-        }
         TransactionModel model = transactionModels.get(position);
 
         holder.txnTitle.setText(model.getTitle());
@@ -162,6 +159,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public int getItemCount() {
+        
         return this.transactionModels.size();
     }
 

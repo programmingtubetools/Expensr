@@ -1,6 +1,8 @@
 package com.programmingtubeofficial.expensr;
 
-public class TransactionModel {
+import java.io.Serializable;
+
+public class TransactionModel implements Serializable {
     private String title;
     private int icon;
     private double amount;

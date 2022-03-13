@@ -6,4 +6,163 @@
     android:layout_height="match_parent"
     tools:context=".transaction_history">
 
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="128sp"
+        android:layout_height="128sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="320dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/gradient_circle" />
+
+    <ImageView
+        android:id="@+id/imgBackHist"
+        android:layout_width="48sp"
+        android:layout_height="48sp"
+        android:layout_marginTop="56dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.022"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_arrow_back_white_24" />
+
+    <GridLayout
+        android:id="@+id/summaryHeaderHistory"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageView3"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:columnCount="3"
+        android:background="@drawable/border_background"
+        android:layout_marginTop="20sp"
+        android:alignmentMode="alignBounds"
+        android:rowOrderPreserved="false"
+        android:useDefaultMargins="true"
+        >
+        <RelativeLayout
+            android:layout_columnWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+
+                android:orientation="vertical"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto"
+                    android:text="Income"
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+                <TextView
+                    android:id="@+id/incomeSummaryHist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto"
+                    android:textSize="15sp"
+                    android:layout_margin="5sp"
+                    android:textColor="@color/cobaltBlue"
+                    android:text="0"/>
+            </LinearLayout>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_columnWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto"
+                    android:textSize="15sp"
+                    android:textColor="@color/black"
+                    android:text="Expenses"
+                    />
+                <TextView
+                    android:id="@+id/expenseSummaryHist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto"
+                    android:textSize="15sp"
+                    android:layout_margin="5sp"
+                    android:textColor="@color/redShade"
+                    android:text="0"/>
+            </LinearLayout>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_columnWeight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto"
+                    android:textSize="15sp"
+                    android:textColor="@color/black"
+                    android:text="Savings"
+                    />
+                <TextView
+                    android:id="@+id/savingsSummaryHist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto"
+                    android:textSize="15sp"
+                    android:layout_margin="5sp"
+                    android:textColor="@color/lightGreen"
+                    android:text="0"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </GridLayout>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10sp"
+        android:fontFamily="@font/raleway_extrabold"
+        android:text="Transaction History"
+        android:textColor="@color/darkGreen"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/summaryHeaderHistory"
+         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/txnHistoryList"
+        android:layout_width="match_parent"
+        android:layout_height="300sp"
+        app:layout_constraintTop_toBottomOf="@id/textView2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="5sp"
+        android:layout_marginBottom="10sp"
+        android:orientation="vertical"
+        android:layout_marginStart="5sp"
+        android:layout_marginEnd="5sp"
+        android:scrollbars="vertical"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

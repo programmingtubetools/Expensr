@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,7 +29,11 @@ import com.google.firebase.auth.FirebaseUser;
         Handler handler = new Handler();
         handler.postDelayed(() -> {
             Intent intent=new Intent(MainActivity.this, nextPage);
-            startActivity(intent);
+            try{
+                startActivity(intent);
+            }catch (Exception e){
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
             finish();
         },1500);
     }
