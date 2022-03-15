@@ -11,4 +11,5 @@
     <string name="login_failed">"Login failed"</string>
     <string name="register_on_login_page">Don\'t have an account? <b>Sign Up</b></string>
     <string name="login_on_register_page">Already have an account? <b>Sign In</b></string>
+    <string name="gso_id">714247290164-0hnqspadgtcsn9gptvesvohp6ut39jgt.apps.googleusercontent.com</string>
 </resources>

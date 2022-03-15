@@ -9,6 +9,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Expensr">
         <activity
+            android:name=".ForgetPassword"
+            android:exported="false" />
+        <activity
             android:name=".transaction_history"
             android:exported="false" />
         <activity

@@ -144,6 +144,7 @@
         android:fontFamily="@font/raleway_extrabold"
         android:text="Transaction History"
         android:textColor="@color/darkGreen"
+        app:layout_constraintHorizontal_bias="0.06"
         android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
